@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.dto.PaymentSchemeDto;
 import com.example.dto.requestDto.AddPaymentSchemeRequestDto;
+import com.example.entity.PaymentSchemeEntity;
 
 import java.util.List;
 

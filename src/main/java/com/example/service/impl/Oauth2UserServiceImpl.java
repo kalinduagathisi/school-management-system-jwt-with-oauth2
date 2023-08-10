@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -28,30 +30,30 @@ public class Oauth2UserServiceImpl implements Oauth2UserService, UserDetailsServ
 
     private final UserRepository userRepository;
 
+
     @Override
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
-
-        /*loadUserByUsername method users by username. So if you don't specify an email as a username, you need to pass the param as username in postman. */
-
-        log.info("Execute loadUserByUsername: s: " + userEmail);
         try {
-            UsernamePasswordAuthenticationToken authentication =
-                    (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            User user = (User) authentication.getPrincipal();
-            String clientId = user.getUsername();
-
-            if(clientId.equals(OAuth2Constant.ADMIN_CLIENT_ID)) {
-                Optional<UserEntity> byUserEmail = userRepository.findByEmail(userEmail);
-                if(!byUserEmail.isPresent()) throw new RuntimeException();
-                return new org.springframework.security.core.userdetails.
-                        User(byUserEmail.get().getEmail(), byUserEmail.get().getPassword(),
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+            Optional<UserEntity> byUserEmail = userRepository.findByEmail(userEmail);
+            if (!byUserEmail.isPresent()) {
+                throw new UsernameNotFoundException("User not found with email: " + userEmail);
             }
 
-            return null;
+            UserEntity userEntity = byUserEmail.get();
+            String roleString = userEntity.getRole().toString(); // Assuming user type is an Enum
+
+            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + roleString));
+
+            return new org.springframework.security.core.userdetails.User(
+                    userEntity.getEmail(),
+                    userEntity.getPassword(),
+                    authorities
+            );
         } catch (Exception e) {
-            log.error("Execute loadUserByUsername: " + e.getMessage());
-            throw e;
+            log.error("Error in loadUserByUsername: " + e.getMessage(), e);
+            throw new RuntimeException("An error occurred while loading user details.", e);
         }
     }
 }
+

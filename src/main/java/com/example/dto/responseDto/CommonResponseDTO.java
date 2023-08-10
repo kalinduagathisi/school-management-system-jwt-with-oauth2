@@ -2,9 +2,6 @@ package com.example.dto.responseDto;
 
 import lombok.*;
 
-/**
- * @author hp
- */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

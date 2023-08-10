@@ -32,6 +32,12 @@ public class PaymentSchemeEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paymentSchemeEntity", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<PaymentPlanEntity> paymentPlanEntity = new ArrayList<>(); // Initialize the list
 
+    public PaymentSchemeEntity(String schemeName, String schemeType, List<PaymentPlanEntity> paymentPlanEntity) {
+        this.schemeName = schemeName;
+        this.schemeType = schemeType;
+        this.paymentPlanEntity = paymentPlanEntity;
+    }
+
     // Helper method to add PaymentPlanEntity and set the parent PaymentScheme
     public void addPaymentPlanEntity(PaymentPlanEntity planEntity) {
         planEntity.setPaymentSchemeEntity(this);

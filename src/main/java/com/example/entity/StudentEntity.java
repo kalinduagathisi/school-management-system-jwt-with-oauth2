@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import com.example.enums.StudentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,12 +38,22 @@ public class StudentEntity {
     @Enumerated(EnumType.STRING)
     private StudentStatus studentStatus;
 
-    //    @JsonIgnore
+//        @JsonIgnore
 //    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="schemeId")
 //    @JsonIdentityReference(alwaysAsId=true)  // returns only the id of the required entity
     @ManyToOne (cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "scheme_id")
     private PaymentSchemeEntity paymentSchemeEntity;
+
+    public StudentEntity(String firstName, String lastName, String email, LocalDate dateOfBirth, StudentStatus studentStatus, PaymentSchemeEntity paymentSchemeEntity) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.studentStatus = studentStatus;
+        this.paymentSchemeEntity = paymentSchemeEntity;
+    }
+
 
     public StudentEntity(String firstName, String lastName, String email, LocalDate dateOfBirth, StudentStatus studentStatus) {
         this.firstName = firstName;

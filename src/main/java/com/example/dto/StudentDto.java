@@ -27,5 +27,5 @@ public class StudentDto {
 
     private StudentStatus studentStatus;
 
-//    private PaymentSchemeEntity payment_scheme_Id;
+    private PaymentSchemeEntity payment_scheme_Id;
 }

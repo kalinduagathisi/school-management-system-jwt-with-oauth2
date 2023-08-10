@@ -29,7 +29,7 @@ public class PaymentPlanEntity {
     @JsonIgnore
 //    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "schemeId")
 //    @JsonIdentityReference(alwaysAsId = true)  // returns only the id of the required entity
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "payment_scheme_id")
     private PaymentSchemeEntity paymentSchemeEntity;
 

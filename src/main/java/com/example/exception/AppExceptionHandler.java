@@ -53,4 +53,10 @@ public class AppExceptionHandler {
         return new ResponseEntity<>(
                 new ErrorMsgResponseDto(false, ex.getStatus(), ex.getMsg()), HttpStatus.OK);
     }
+
+    @ExceptionHandler(value = {PaymentSchemeException.class})
+    ResponseEntity<ErrorMsgResponseDto> handlePaymentSchemeException(PaymentSchemeException ex, WebRequest webRequest) {
+        return new ResponseEntity<>(
+                new ErrorMsgResponseDto(false, ex.getStatus(), ex.getMsg()), HttpStatus.OK);
+    }
 }

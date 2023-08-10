@@ -30,6 +30,6 @@ public class AddStudentRequestDto {
     @NotNull
     private StudentStatus studentStatus;
 
-    //    @NotNull
-//    private Integer payment_scheme_Id;
+    @NotNull
+    private String payment_scheme_name;
 }
