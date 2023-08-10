@@ -1,0 +1,4 @@
+This program is only operable by Users.
+Two user role types available.
+        1. ADMIN
+        2.MANAGER
