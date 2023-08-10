@@ -47,4 +47,10 @@ public class AppExceptionHandler {
         return new ResponseEntity<>(
                 new ErrorMsgResponseDto(false, ex.getStatus(), ex.getMsg()), HttpStatus.OK);
     }
+
+    @ExceptionHandler(value = {StudentException.class})
+    ResponseEntity<ErrorMsgResponseDto> handleStudentException(StudentException ex, WebRequest webRequest) {
+        return new ResponseEntity<>(
+                new ErrorMsgResponseDto(false, ex.getStatus(), ex.getMsg()), HttpStatus.OK);
+    }
 }

@@ -30,7 +30,6 @@ public class UserController {
     @GetMapping("/user/{email}")
     public ResponseEntity getUserByEmail(@PathVariable String email) {
         UserDto user = userService.getUserDetailsByUserEmail(email);
-        // Return user details if found
         return new ResponseEntity<>(
                 new CommonResponseDTO(true, "User found!", user), HttpStatus.OK);
 
