@@ -1,9 +1,11 @@
 package com.example.service.impl;
 
 import com.example.constants.ApplicationConstants;
+import com.example.dto.StudentDto;
 import com.example.dto.UserDto;
 import com.example.dto.requestDto.AddUserRequestDto;
 import com.example.dto.requestDto.UpdateUserRequestDto;
+import com.example.entity.StudentEntity;
 import com.example.entity.UserEntity;
 import com.example.exception.UserException;
 import com.example.repository.UserRepository;
@@ -13,6 +15,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,9 +87,26 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    // get all users
     @Override
     public List<UserDto> getAllUsers() {
-        // TODO: 11-Aug-23  
-        return null;
+
+        log.info("Execute method getAllUsers : ");
+
+        List<UserEntity> allUsers = userRepository.findAll();
+        List<UserDto> allUsersToBeGet = new ArrayList<>();
+
+        for (UserEntity user: allUsers){
+            allUsersToBeGet.add(
+                    new UserDto(
+                            user.getId(),
+                            user.getFirstname(),
+                            user.getLastname(),
+                            user.getEmail(),
+                            user.getRole()
+                    )
+            );
+        }
+        return allUsersToBeGet;
     }
 }
