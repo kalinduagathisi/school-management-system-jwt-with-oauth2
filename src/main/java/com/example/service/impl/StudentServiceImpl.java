@@ -20,39 +20,47 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+// Declare the class as a service
 @Service
-@RequiredArgsConstructor
+// Enable logging for the class
 @Log4j2
+// Enable transaction management
+@Transactional
+// Use Lombok to generate constructor injection
+@RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
 
+    // Inject StudentRepository dependency
     private final StudentRepository studentRepository;
+    // Inject PaymentSchemeRepository dependency
     private final PaymentSchemeRepository paymentSchemeRepository;
+    // Inject PaymentSchemeService dependency
     private final PaymentSchemeService paymentSchemeService;
+    // Inject Mapper dependency
     private final Mapper mapper;
 
-    // add new student
+    // Implement the method to add a new student
     @Override
-    @Transactional
     public Boolean addStudent(AddStudentRequestDto addStudentRequestDto) {
 
         try {
+            // Check if a student with the entered email already exists
             Optional<StudentEntity> byStudentEmail = studentRepository.findByEmail(addStudentRequestDto.getEmail());
+            // Check if payment scheme exists with the given name
             Optional<PaymentSchemeEntity> bySchemeName = paymentSchemeRepository.findBySchemeName(addStudentRequestDto.getPayment_scheme_name());
 
-            // check if a student with entered email already exists
-            if (byStudentEmail.isPresent()){
-                throw new StudentException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "Email already exist");
+            if (byStudentEmail.isPresent()) {
+                throw new StudentException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "Email already exists.");
             }
 
-            // check if payment scheme exists with given Id
-            if (!bySchemeName.isPresent()){
-                throw new PaymentSchemeException(ApplicationConstants.RESOURCE_NOT_FOUND, "Payment scheme with given name doesn't exists");
+            if (!bySchemeName.isPresent()) {
+                throw new PaymentSchemeException(ApplicationConstants.RESOURCE_NOT_FOUND, "Payment scheme with given name doesn't exist.");
             }
 
-            PaymentSchemeEntity paymentScheme = bySchemeName.get(); // Retrieve the PaymentSchemeEntity
-//            PaymentSchemeEntity paymentSchemeEntity = paymentSchemeService.getSchemeBySchemeName(addStudentRequestDto.getPayment_scheme_name());
-            //PaymentSchemeEntity paymentScheme = mapper.paymentSchemeDtoToPaymentScheme(paymentSchemeService.getSchemeBySchemeName(addStudentRequestDto.getPayment_scheme_name()));
+            // Retrieve the PaymentSchemeEntity
+            PaymentSchemeEntity paymentScheme = bySchemeName.get();
 
+            // Create StudentEntity and associate it with the PaymentSchemeEntity
             StudentEntity studentEntity = new StudentEntity(
                     addStudentRequestDto.getFirstName(),
                     addStudentRequestDto.getLastName(),
@@ -60,80 +68,78 @@ public class StudentServiceImpl implements StudentService {
                     addStudentRequestDto.getDateOfBirth(),
                     addStudentRequestDto.getStudentStatus()
             );
-            studentEntity.setPaymentSchemeEntity(paymentScheme); // Assign the retrieved PaymentSchemeEntity
+            studentEntity.setPaymentSchemeEntity(paymentScheme);
 
             studentRepository.save(studentEntity);
 
             return true;
 
-        }catch (Exception e){
-            log.error("Method addStudent : "+ e.getMessage(), e);
+        } catch (Exception e) {
+            // Log and handle any exceptions
+            log.error("Method addStudent : " + e.getMessage(), e);
             throw e;
         }
-
-
     }
 
+    // Implement the method to update student details
     @Override
-    @Transactional
     public Boolean updateStudent(UpdateStudentRequestDto updateStudentRequestDto) {
 
         log.info("Execute method updateStudent : updateStudentRequestDto : " + updateStudentRequestDto.toString());
 
         try {
-            Optional<StudentEntity> byStudentEmail = studentRepository.findByEmail(updateStudentRequestDto.getEmail());
+            // Check if a student exists with the given ID
             Optional<StudentEntity> byStudentId = studentRepository.findById(updateStudentRequestDto.getStudentId());
+            if (!byStudentId.isPresent()) {
+                throw new StudentException(ApplicationConstants.RESOURCE_NOT_FOUND, "Student with given ID not found.");
+            }
 
+            // Check if payment scheme exists with the given name
             Optional<PaymentSchemeEntity> bySchemeName = paymentSchemeRepository.findBySchemeName(updateStudentRequestDto.getPayment_scheme_name());
-
-            // check if a student exists with the given ID
-            if (!byStudentId.isPresent()){
-                throw new StudentException(ApplicationConstants.RESOURCE_NOT_FOUND, "Student with given ID not found!");
+            if (!bySchemeName.isPresent()) {
+                throw new PaymentSchemeException(ApplicationConstants.RESOURCE_NOT_FOUND, "Payment scheme not found.");
             }
 
-            if (!bySchemeName.isPresent()){
-                throw new PaymentSchemeException(ApplicationConstants.RESOURCE_NOT_FOUND, "Payment scheme not found!");
-            }
-
+            // Retrieve the StudentEntity and PaymentSchemeEntity
             StudentEntity studentEntity = byStudentId.get();
-            PaymentSchemeEntity paymentScheme = bySchemeName.get(); // Retrieve the PaymentSchemeEntity
+            PaymentSchemeEntity paymentScheme = bySchemeName.get();
 
-            // check whether same student email
-            if (byStudentEmail.isPresent()){
-                if (studentEntity.getStudentId() != byStudentEmail.get().getStudentId()){
-                    throw new StudentException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "Student with given email already exists!");
-                }
+            // Check whether the email already exists for another student
+            Optional<StudentEntity> byStudentEmail = studentRepository.findByEmail(updateStudentRequestDto.getEmail());
+            if (byStudentEmail.isPresent() && studentEntity.getStudentId() != byStudentEmail.get().getStudentId()) {
+                throw new StudentException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "Student with given email already exists.");
             }
 
+            // Update student details and assign the PaymentSchemeEntity
             studentEntity.setFirstName(updateStudentRequestDto.getFirstName());
             studentEntity.setLastName(updateStudentRequestDto.getLastName());
             studentEntity.setEmail(updateStudentRequestDto.getEmail());
             studentEntity.setDateOfBirth(updateStudentRequestDto.getDateOfBirth());
             studentEntity.setStudentStatus(updateStudentRequestDto.getStudentStatus());
-            studentEntity.setPaymentSchemeEntity(paymentScheme); // Assign the retrieved PaymentSchemeEntity
+            studentEntity.setPaymentSchemeEntity(paymentScheme);
 
             studentRepository.save(studentEntity);
 
             return true;
 
-        }catch (Exception e){
-            log.error("Method updateStudent : "+ e.getMessage(), e);
+        } catch (Exception e) {
+            // Log and handle any exceptions
+            log.error("Method updateStudent : " + e.getMessage(), e);
             throw e;
         }
     }
 
-    
-    // get student by email
+    // Implement the method to get student by email
     @Override
     public StudentDto getStudentByEmail(String email) {
         try {
+            // Check if a student with the given email exists
             Optional<StudentEntity> byStudentEmail = studentRepository.findByEmail(email);
-            
-            if (!byStudentEmail.isPresent()){
-                throw new StudentException(ApplicationConstants.RESOURCE_NOT_FOUND, "Student with email = " + email+ " not found!");
-            }
-            
-            else {
+
+            if (!byStudentEmail.isPresent()) {
+                throw new StudentException(ApplicationConstants.RESOURCE_NOT_FOUND, "Student with email = " + email + " not found.");
+            } else {
+                // Create and return a StudentDto
                 return new StudentDto(
                         byStudentEmail.get().getStudentId(),
                         byStudentEmail.get().getFirstName(),
@@ -142,26 +148,26 @@ public class StudentServiceImpl implements StudentService {
                         byStudentEmail.get().getDateOfBirth(),
                         byStudentEmail.get().getStudentStatus(),
                         byStudentEmail.get().getPaymentSchemeEntity()
-                        );
+                );
             }
-           
-            
-        }catch (Exception e){
-            log.error("Method getStudentByEmail : "+ e.getMessage(), e);
+        } catch (Exception e) {
+            // Log and handle any exceptions
+            log.error("Method getStudentByEmail : " + e.getMessage(), e);
             throw e;
         }
-        
     }
 
+    // Implement the method to get details of all students
     @Override
     public List<StudentDto> getAllStudents() {
-
         log.info("Execute method getAllStudents : ");
 
+        // Retrieve all student entities
         List<StudentEntity> allStudents = studentRepository.findAll();
         List<StudentDto> allStudentsToBeGet = new ArrayList<>();
 
-        for (StudentEntity student: allStudents){
+        // Convert student entities to DTOs for response
+        for (StudentEntity student : allStudents) {
             allStudentsToBeGet.add(
                     new StudentDto(
                             student.getStudentId(),
@@ -177,15 +183,13 @@ public class StudentServiceImpl implements StudentService {
         return allStudentsToBeGet;
     }
 
-
-    // get students by birth moth and year
+    // Implement the method to get students by birth month and year
     @Override
     public List<StudentDto> getStudentsByBirthMonthAndYear(int birthMonth, int birthYear) {
-
         log.info("Execute method getStudentsByBirthMonthAndYear : ");
 
-        // Validate birth month (between 1 and 12 both inclusive)
-        if (birthMonth <= 1 || birthMonth >= 12) {
+        // Validate birth month (between 1 and 12 inclusive)
+        if (birthMonth < 1 || birthMonth > 12) {
             throw new IllegalArgumentException("Birth month should be between 1 and 12.");
         }
 
@@ -195,10 +199,12 @@ public class StudentServiceImpl implements StudentService {
             throw new IllegalArgumentException("Birth year should be between 1950 and the current year.");
         }
 
+        // Retrieve student entities by birth month and year
         List<StudentEntity> allStudents = studentRepository.findByBirthMonthAndYear(birthMonth, birthYear);
         List<StudentDto> allStudentsToBeGet = new ArrayList<>();
 
-        for (StudentEntity student: allStudents){
+        // Convert student entities to DTOs for response
+        for (StudentEntity student : allStudents) {
             allStudentsToBeGet.add(
                     new StudentDto(
                             student.getStudentId(),
@@ -214,17 +220,7 @@ public class StudentServiceImpl implements StudentService {
         return allStudentsToBeGet;
     }
 
-
-
-    /**
-     * Retrieves a list of student data within a specified birthdate range.
-     *
-     * @param startDate The start date of the birthdate range.
-     * @param endDate   The end date of the birthdate range.
-     * @return A list of StudentDto objects representing students within the specified birthdate range.
-     * @throws IllegalArgumentException If the start date is after the end date or if the start date is before
-     *                                  January 1, 1950.
-     */
+    // Implement the method to get students by birthdate range
     @Override
     public List<StudentDto> getStudentsByBirthdateRange(Date startDate, Date endDate) {
         // Log the execution of the method
@@ -267,5 +263,4 @@ public class StudentServiceImpl implements StudentService {
         // Return the list of StudentDto objects within the specified birthdate range
         return allStudentsToBeGet;
     }
-
 }

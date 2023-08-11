@@ -19,24 +19,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// Declare the class as a service
 @Service
+// Enable logging for the class
 @Log4j2
+// Enable transaction management
+@Transactional
+// Use Lombok to generate constructor injection
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    // Inject UserRepository dependency
     private final UserRepository userRepository;
+    // Inject PasswordEncoder dependency
     private final PasswordEncoder passwordEncoder;
 
+    // Implement the method to get user details by email
     @Override
     public UserDto getUserDetailsByUserEmail(String userEmail) {
         try {
-
+            // Check if a user with the given email exists
             Optional<UserEntity> byUserEmail = userRepository.findByEmail(userEmail);
-
-            if (!byUserEmail.isPresent()){
-                throw new UserException(ApplicationConstants.RESOURCE_NOT_FOUND, "User email not found!");
-            }
-            else {
+            if (!byUserEmail.isPresent()) {
+                throw new UserException(ApplicationConstants.RESOURCE_NOT_FOUND, "User email not found.");
+            } else {
+                // Create and return UserDto
                 return new UserDto(
                         byUserEmail.get().getId(),
                         byUserEmail.get().getFirstname(),
@@ -45,24 +52,23 @@ public class UserServiceImpl implements UserService {
                         byUserEmail.get().getRole()
                 );
             }
-
-        }catch (Exception e){
-            log.error("Method getUserDetailsByUserEmail : "+ e.getMessage(), e);
+        } catch (Exception e) {
+            // Log and handle any exceptions
+            log.error("Method getUserDetailsByUserEmail : " + e.getMessage(), e);
             throw e;
         }
     }
 
+    // Implement the method to add a new user
     @Override
     public Boolean addUser(AddUserRequestDto addUserRequestDto) {
         try {
-
+            // Check if a user with the same email already exists
             Optional<UserEntity> byUserEmail = userRepository.findByEmail(addUserRequestDto.getEmail());
-
-            // check if user with same email already exists
-            if (byUserEmail.isPresent()){
-                throw new UserException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "Email already exist");
-            }
-            else {
+            if (byUserEmail.isPresent()) {
+                throw new UserException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "Email already exists.");
+            } else {
+                // Create and save a new UserEntity
                 userRepository.save(
                         new UserEntity(
                                 addUserRequestDto.getFirstname(),
@@ -74,36 +80,35 @@ public class UserServiceImpl implements UserService {
                 );
                 return true;
             }
-
-        }catch (Exception e){
-            log.error("Method addUser : "+ e.getMessage(), e);
+        } catch (Exception e) {
+            // Log and handle any exceptions
+            log.error("Method addUser : " + e.getMessage(), e);
             throw e;
         }
     }
 
+    // Implement the method to update user details
     @Override
-    @Transactional
     public Boolean updateUser(String email, UpdateUserRequestDto updateUserRequestDto) {
-
-
         try {
+            // Check if a user with the given email exists
             Optional<UserEntity> byUserEmail = userRepository.findByEmail(email);
-            assert false;
             Optional<UserEntity> byUserId = userRepository.findById(updateUserRequestDto.getId());
 
-            if (!byUserEmail.isPresent()){
-                throw new UserException(ApplicationConstants.RESOURCE_NOT_FOUND, "User with given email not found!");
+            if (!byUserEmail.isPresent()) {
+                throw new UserException(ApplicationConstants.RESOURCE_NOT_FOUND, "User with given email not found.");
             }
 
             UserEntity userEntity = byUserEmail.get();
 
-            // check whether same user email
-            if (byUserEmail.isPresent()){
-                if (userEntity.getId() != byUserEmail.get().getId()){
-                    throw new StudentException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "User with given email already exists!");
+            // Check whether same user email
+            if (byUserId.isPresent()) {
+                if (userEntity.getId() != byUserId.get().getId()) {
+                    throw new StudentException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "User with given email already exists.");
                 }
             }
 
+            // Update user details
             userEntity.setFirstname(updateUserRequestDto.getFirstname());
             userEntity.setLastname(updateUserRequestDto.getLastname());
             userEntity.setEmail(updateUserRequestDto.getEmail());
@@ -111,22 +116,24 @@ public class UserServiceImpl implements UserService {
 
             return true;
 
-        }catch (Exception e){
-            log.error("Method addUser : "+ e.getMessage(), e);
+        } catch (Exception e) {
+            // Log and handle any exceptions
+            log.error("Method updateUser : " + e.getMessage(), e);
             throw e;
         }
     }
 
-    // get all users
+    // Implement the method to get details of all users
     @Override
     public List<UserDto> getAllUsers() {
-
         log.info("Execute method getAllUsers : ");
 
+        // Retrieve all user entities
         List<UserEntity> allUsers = userRepository.findAll();
         List<UserDto> allUsersToBeGet = new ArrayList<>();
 
-        for (UserEntity user: allUsers){
+        // Create UserDto for each user entity
+        for (UserEntity user : allUsers) {
             allUsersToBeGet.add(
                     new UserDto(
                             user.getId(),
