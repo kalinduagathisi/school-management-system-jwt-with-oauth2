@@ -10,7 +10,7 @@ public interface UserService {
 
     UserDto getUserDetailsByUserEmail(String userEmail);
     Boolean addUser(AddUserRequestDto addUserRequestDto);
-    Boolean updateUser(UpdateUserRequestDto updateUserRequestDto);
+    Boolean updateUser(String email, UpdateUserRequestDto updateUserRequestDto);
     List<UserDto> getAllUsers();
 
 }

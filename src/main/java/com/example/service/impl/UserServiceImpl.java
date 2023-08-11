@@ -5,8 +5,10 @@ import com.example.dto.StudentDto;
 import com.example.dto.UserDto;
 import com.example.dto.requestDto.AddUserRequestDto;
 import com.example.dto.requestDto.UpdateUserRequestDto;
+import com.example.entity.PaymentSchemeEntity;
 import com.example.entity.StudentEntity;
 import com.example.entity.UserEntity;
+import com.example.exception.StudentException;
 import com.example.exception.UserException;
 import com.example.repository.UserRepository;
 import com.example.service.UserService;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,9 +85,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean updateUser(UpdateUserRequestDto updateUserRequestDto) {
-        // TODO: 11-Aug-23  
-        return null;
+    @Transactional
+    public Boolean updateUser(String email, UpdateUserRequestDto updateUserRequestDto) {
+
+
+        try {
+            Optional<UserEntity> byUserEmail = userRepository.findByEmail(email);
+            assert false;
+            Optional<UserEntity> byUserId = userRepository.findById(updateUserRequestDto.getId());
+
+            if (!byUserEmail.isPresent()){
+                throw new UserException(ApplicationConstants.RESOURCE_NOT_FOUND, "User with given email not found!");
+            }
+
+            UserEntity userEntity = byUserEmail.get();
+
+            // check whether same user email
+            if (byUserEmail.isPresent()){
+                if (userEntity.getId() != byUserEmail.get().getId()){
+                    throw new StudentException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "User with given email already exists!");
+                }
+            }
+
+            userEntity.setFirstname(updateUserRequestDto.getFirstname());
+            userEntity.setLastname(updateUserRequestDto.getLastname());
+            userEntity.setEmail(updateUserRequestDto.getEmail());
+            userEntity.setRole(updateUserRequestDto.getRole());
+
+            return true;
+
+        }catch (Exception e){
+            log.error("Method addUser : "+ e.getMessage(), e);
+            throw e;
+        }
     }
 
     // get all users
