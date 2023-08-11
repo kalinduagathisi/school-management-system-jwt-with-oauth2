@@ -18,10 +18,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -216,4 +213,59 @@ public class StudentServiceImpl implements StudentService {
         }
         return allStudentsToBeGet;
     }
+
+
+
+    /**
+     * Retrieves a list of student data within a specified birthdate range.
+     *
+     * @param startDate The start date of the birthdate range.
+     * @param endDate   The end date of the birthdate range.
+     * @return A list of StudentDto objects representing students within the specified birthdate range.
+     * @throws IllegalArgumentException If the start date is after the end date or if the start date is before
+     *                                  January 1, 1950.
+     */
+    @Override
+    public List<StudentDto> getStudentsByBirthdateRange(Date startDate, Date endDate) {
+        // Log the execution of the method
+        log.info("Execute method getStudentsByBirthdateRange : ");
+
+        // Check if the input dates are valid
+        if (startDate == null || endDate == null || startDate.after(endDate)) {
+            throw new IllegalArgumentException("Invalid date range.");
+        }
+
+        // Define the minimum start date for comparison
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(1950, Calendar.JANUARY, 1);
+        Date minStartDate = calendar.getTime();
+
+        // Check if the start date is valid
+        if (startDate.before(minStartDate)) {
+            throw new IllegalArgumentException("Start date should be after January 1, 1950.");
+        }
+
+        // Retrieve student entities within the specified birthdate range
+        List<StudentEntity> allStudents = studentRepository.findByBirthdateBetween(startDate, endDate);
+
+        // Convert student entities to DTOs for response
+        List<StudentDto> allStudentsToBeGet = new ArrayList<>();
+        for (StudentEntity student : allStudents) {
+            allStudentsToBeGet.add(
+                    new StudentDto(
+                            student.getStudentId(),
+                            student.getFirstName(),
+                            student.getLastName(),
+                            student.getEmail(),
+                            student.getDateOfBirth(),
+                            student.getStudentStatus(),
+                            student.getPaymentSchemeEntity()
+                    )
+            );
+        }
+
+        // Return the list of StudentDto objects within the specified birthdate range
+        return allStudentsToBeGet;
+    }
+
 }

@@ -6,6 +6,7 @@ import com.example.dto.requestDto.AddStudentRequestDto;
 import com.example.dto.requestDto.UpdateStudentRequestDto;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -16,5 +17,6 @@ public interface StudentService {
     StudentDto getStudentByEmail(String email);
     List<StudentDto> getAllStudents();
     List<StudentDto> getStudentsByBirthMonthAndYear(int birthMonth, int birthYear);
+    List<StudentDto> getStudentsByBirthdateRange(Date startDate, Date endDate);
 
 }

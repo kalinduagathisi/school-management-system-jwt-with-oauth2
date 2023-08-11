@@ -48,6 +48,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 				.antMatchers(HttpMethod.GET, "/v1/students/get-students/filter")
 				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
 
+				.antMatchers(HttpMethod.GET, "/v1/students/get-students/filter/range")
+				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+
 				.antMatchers(HttpMethod.POST, "/v1/students/add")
 				.access("hasAnyRole('ROLE_ADMIN')")
 
