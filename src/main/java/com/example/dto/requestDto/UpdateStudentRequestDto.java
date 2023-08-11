@@ -30,8 +30,8 @@ public class UpdateStudentRequestDto {
     @NotNull
     private LocalDate dateOfBirth;
 
-//    @NotNull
-//    private Integer payment_scheme_Id;
+    @NotNull
+    private String payment_scheme_name;
 
     @NotNull
     private StudentStatus studentStatus;

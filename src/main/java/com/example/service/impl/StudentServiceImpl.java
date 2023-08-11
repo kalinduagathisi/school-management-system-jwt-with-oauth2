@@ -77,9 +77,51 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
     public Boolean updateStudent(UpdateStudentRequestDto updateStudentRequestDto) {
-        // TODO: 10-Aug-23  
-        return null;
+
+        log.info("Execute method updateStudent : updateStudentRequestDto : " + updateStudentRequestDto.toString());
+
+        try {
+            Optional<StudentEntity> byStudentEmail = studentRepository.findByEmail(updateStudentRequestDto.getEmail());
+            Optional<StudentEntity> byStudentId = studentRepository.findById(updateStudentRequestDto.getStudentId());
+
+            Optional<PaymentSchemeEntity> bySchemeName = paymentSchemeRepository.findBySchemeName(updateStudentRequestDto.getPayment_scheme_name());
+
+            // check if a student exists with the given ID
+            if (!byStudentId.isPresent()){
+                throw new StudentException(ApplicationConstants.RESOURCE_NOT_FOUND, "Student with given ID not found!");
+            }
+
+            if (!bySchemeName.isPresent()){
+                throw new PaymentSchemeException(ApplicationConstants.RESOURCE_NOT_FOUND, "Payment scheme not found!");
+            }
+
+            StudentEntity studentEntity = byStudentId.get();
+            PaymentSchemeEntity paymentScheme = bySchemeName.get(); // Retrieve the PaymentSchemeEntity
+
+            // check whether same student email
+            if (byStudentEmail.isPresent()){
+                if (studentEntity.getStudentId() != byStudentEmail.get().getStudentId()){
+                    throw new StudentException(ApplicationConstants.RESOURCE_ALREADY_EXIST, "Student with given email already exists!");
+                }
+            }
+
+            studentEntity.setFirstName(updateStudentRequestDto.getFirstName());
+            studentEntity.setLastName(updateStudentRequestDto.getLastName());
+            studentEntity.setEmail(updateStudentRequestDto.getEmail());
+            studentEntity.setDateOfBirth(updateStudentRequestDto.getDateOfBirth());
+            studentEntity.setStudentStatus(updateStudentRequestDto.getStudentStatus());
+            studentEntity.setPaymentSchemeEntity(paymentScheme); // Assign the retrieved PaymentSchemeEntity
+
+            studentRepository.save(studentEntity);
+
+            return true;
+
+        }catch (Exception e){
+            log.error("Method updateStudent : "+ e.getMessage(), e);
+            throw e;
+        }
     }
 
     

@@ -26,9 +26,18 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 				.authorizeRequests()
 //--------------students------------------------------------------------------------------------------------------------
 				.antMatchers(HttpMethod.GET, "/v1/students/get-student/{email}")
-				.access("hasAnyRole('ROLE_ADMIN')")
+				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+
+				.antMatchers(HttpMethod.GET, "/v1/students/get-all-students")
+				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+
 				.antMatchers(HttpMethod.POST, "/v1/students/add")
 				.access("hasAnyRole('ROLE_ADMIN')")
+
+				.antMatchers(HttpMethod.PUT, "/v1/students/update")
+				.access("hasAnyRole('ROLE_ADMIN')")
+
+
 //--------------payments------------------------------------------------------------------------------------------------
 				.antMatchers(HttpMethod.POST, "/v1/payments/add")
 				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")

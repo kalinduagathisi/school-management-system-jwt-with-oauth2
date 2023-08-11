@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dto.StudentDto;
 import com.example.dto.requestDto.AddStudentRequestDto;
+import com.example.dto.requestDto.UpdateStudentRequestDto;
 import com.example.dto.responseDto.CommonResponseDTO;
 import com.example.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/students")
 @RequiredArgsConstructor
-public class StudentController {
+public class StudentDivisionController {
 
     private final StudentService studentService;
 
@@ -41,6 +42,14 @@ public class StudentController {
         return new ResponseEntity<>(
                 new CommonResponseDTO(true, "All Students loaded!", allStudents), HttpStatus.OK);
 
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity updateStudent(@RequestBody @Valid UpdateStudentRequestDto updateStudentRequestDto){
+        boolean result = studentService.updateStudent(updateStudentRequestDto);
+        return new ResponseEntity<>(
+                new CommonResponseDTO(result, "Student successfully updated..", null), HttpStatus.OK
+        );
     }
 
 
