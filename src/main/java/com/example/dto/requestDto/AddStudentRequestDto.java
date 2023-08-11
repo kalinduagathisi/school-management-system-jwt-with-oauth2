@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -16,12 +18,15 @@ import java.time.LocalDate;
 public class AddStudentRequestDto {
 
     @NotNull
+    @NotBlank
     private String firstName;
 
     @NotNull
+    @NotBlank
     private String lastName;
 
     @NotNull
+    @Email
     private String email;
 
     @NotNull

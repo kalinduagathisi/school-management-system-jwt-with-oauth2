@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/students")
@@ -31,6 +32,14 @@ public class StudentController {
         StudentDto student = studentService.getStudentByEmail(email);
         return new ResponseEntity<>(
                 new CommonResponseDTO(true, "Student found!", student), HttpStatus.OK);
+
+    }
+
+    @GetMapping("/get-all-students")
+    public ResponseEntity getAllStudents(){
+        List<StudentDto> allStudents = studentService.getAllStudents();
+        return new ResponseEntity<>(
+                new CommonResponseDTO(true, "All Students loaded!", allStudents), HttpStatus.OK);
 
     }
 

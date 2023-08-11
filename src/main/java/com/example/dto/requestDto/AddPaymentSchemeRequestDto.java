@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,10 @@ import java.util.Map;
 @NoArgsConstructor
 public class AddPaymentSchemeRequestDto {
 
+    @NotNull
     private String schemeName;
 
+    @NotNull
     private String schemeType;
 
 //    private List<PaymentPlanEntity> paymentPlan;

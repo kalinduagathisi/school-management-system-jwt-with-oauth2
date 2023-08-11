@@ -18,6 +18,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -109,5 +111,29 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
         
+    }
+
+    @Override
+    public List<StudentDto> getAllStudents() {
+
+        log.info("Execute method getAllStudents : ");
+
+        List<StudentEntity> allStudents = studentRepository.findAll();
+        List<StudentDto> allStudentsToBeGet = new ArrayList<>();
+
+        for (StudentEntity student: allStudents){
+            allStudentsToBeGet.add(
+                    new StudentDto(
+                            student.getStudentId(),
+                            student.getFirstName(),
+                            student.getLastName(),
+                            student.getEmail(),
+                            student.getDateOfBirth(),
+                            student.getStudentStatus(),
+                            student.getPaymentSchemeEntity()
+                    )
+            );
+        }
+        return allStudentsToBeGet;
     }
 }
