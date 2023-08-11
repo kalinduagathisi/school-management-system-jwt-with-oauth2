@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -161,6 +162,43 @@ public class StudentServiceImpl implements StudentService {
         log.info("Execute method getAllStudents : ");
 
         List<StudentEntity> allStudents = studentRepository.findAll();
+        List<StudentDto> allStudentsToBeGet = new ArrayList<>();
+
+        for (StudentEntity student: allStudents){
+            allStudentsToBeGet.add(
+                    new StudentDto(
+                            student.getStudentId(),
+                            student.getFirstName(),
+                            student.getLastName(),
+                            student.getEmail(),
+                            student.getDateOfBirth(),
+                            student.getStudentStatus(),
+                            student.getPaymentSchemeEntity()
+                    )
+            );
+        }
+        return allStudentsToBeGet;
+    }
+
+
+    // get students by birth moth and year
+    @Override
+    public List<StudentDto> getStudentsByBirthMonthAndYear(int birthMonth, int birthYear) {
+
+        log.info("Execute method getStudentsByBirthMonthAndYear : ");
+
+        // Validate birth month (between 1 and 12 both inclusive)
+        if (birthMonth <= 1 || birthMonth >= 12) {
+            throw new IllegalArgumentException("Birth month should be between 1 and 12.");
+        }
+
+        // Validate birth year (between 1950 and current year)
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        if (birthYear < 1950 || birthYear > currentYear) {
+            throw new IllegalArgumentException("Birth year should be between 1950 and the current year.");
+        }
+
+        List<StudentEntity> allStudents = studentRepository.findByBirthMonthAndYear(birthMonth, birthYear);
         List<StudentDto> allStudentsToBeGet = new ArrayList<>();
 
         for (StudentEntity student: allStudents){

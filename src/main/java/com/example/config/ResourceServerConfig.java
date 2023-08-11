@@ -12,19 +12,22 @@ import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHand
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
+	// Define a resource identifier
 	private static final String RESOURCE_ID = "resource_id";
-	
+
+	// Configure the resource server's security settings
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) {
 		resources.resourceId(RESOURCE_ID).stateless(false);
 	}
 
+	// Configure the HTTP security settings for the resource server
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http
-//                anonymous().disable()
 				.authorizeRequests()
-//--------------users------------------------------------------------------------------------------------------------
+				// Define URL patterns and access rules based on roles
+
 				.antMatchers(HttpMethod.GET, "/v1/users/user/{email}")
 				.access("hasRole('ROLE_ADMIN')")
 
@@ -34,11 +37,15 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 				.antMatchers(HttpMethod.PUT, "/v1/users/get-all-users")
 				.access("hasRole('ROLE_ADMIN')")
 
-//--------------students------------------------------------------------------------------------------------------------
+
+
 				.antMatchers(HttpMethod.GET, "/v1/students/get-student/{email}")
 				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
 
 				.antMatchers(HttpMethod.GET, "/v1/students/get-all-students")
+				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+
+				.antMatchers(HttpMethod.GET, "/v1/students/get-students/filter")
 				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
 
 				.antMatchers(HttpMethod.POST, "/v1/students/add")
@@ -48,7 +55,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 				.access("hasAnyRole('ROLE_ADMIN')")
 
 
-//--------------payments------------------------------------------------------------------------------------------------
+
+
 				.antMatchers(HttpMethod.POST, "/v1/payments/add")
 				.access("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
 
@@ -62,5 +70,4 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 				.exceptionHandling()
 				.accessDeniedHandler(new OAuth2AccessDeniedHandler());
 	}
-
 }

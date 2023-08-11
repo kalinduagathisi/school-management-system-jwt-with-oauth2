@@ -1,13 +1,10 @@
 package com.example.controller;
 
 
-import com.example.dto.StudentDto;
 import com.example.dto.UserDto;
 import com.example.dto.requestDto.AddUserRequestDto;
-import com.example.dto.requestDto.UpdateStudentRequestDto;
 import com.example.dto.requestDto.UpdateUserRequestDto;
 import com.example.dto.responseDto.CommonResponseDTO;
-import com.example.entity.UserEntity;
 import com.example.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -41,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/get-all-users")
-    public ResponseEntity getAllUsers(){
+    public ResponseEntity getAllUsers() {
         List<UserDto> allUsers = userService.getAllUsers();
         return new ResponseEntity<>(
                 new CommonResponseDTO(true, "All Users loaded!", allUsers), HttpStatus.OK);
@@ -49,7 +46,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{email}")
-    public ResponseEntity updateUser(@PathVariable String email, @RequestBody UpdateUserRequestDto updateUserRequestDto){
+    public ResponseEntity updateUser(@PathVariable String email, @RequestBody UpdateUserRequestDto updateUserRequestDto) {
         boolean result = userService.updateUser(email, updateUserRequestDto);
         return new ResponseEntity<>(
                 new CommonResponseDTO(result, "User successfully updated..", null), HttpStatus.OK

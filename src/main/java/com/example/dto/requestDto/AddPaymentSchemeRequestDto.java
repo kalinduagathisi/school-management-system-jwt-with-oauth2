@@ -1,6 +1,5 @@
 package com.example.dto.requestDto;
 
-import com.example.entity.PaymentPlanEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

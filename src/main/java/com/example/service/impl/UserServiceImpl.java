@@ -1,12 +1,9 @@
 package com.example.service.impl;
 
 import com.example.constants.ApplicationConstants;
-import com.example.dto.StudentDto;
 import com.example.dto.UserDto;
 import com.example.dto.requestDto.AddUserRequestDto;
 import com.example.dto.requestDto.UpdateUserRequestDto;
-import com.example.entity.PaymentSchemeEntity;
-import com.example.entity.StudentEntity;
 import com.example.entity.UserEntity;
 import com.example.exception.StudentException;
 import com.example.exception.UserException;

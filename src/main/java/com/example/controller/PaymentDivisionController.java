@@ -22,15 +22,15 @@ public class PaymentDivisionController {
     private final Mapper mapper;
 
     @PostMapping("/add")
-    public ResponseEntity addPaymentScheme (@RequestBody @Valid AddPaymentSchemeRequestDto addPaymentSchemeRequestDto){
+    public ResponseEntity addPaymentScheme(@RequestBody @Valid AddPaymentSchemeRequestDto addPaymentSchemeRequestDto) {
         boolean result = paymentSchemeService.addPaymentScheme(addPaymentSchemeRequestDto);
         return new ResponseEntity<>(
-                new CommonResponseDTO(result, "New payment scheme successfully created..",null), HttpStatus.OK
+                new CommonResponseDTO(result, "New payment scheme successfully created..", null), HttpStatus.OK
         );
     }
 
     @GetMapping("/get-scheme/{name}")
-    public ResponseEntity getPaymentSchemeByEmail(@PathVariable String name){
+    public ResponseEntity getPaymentSchemeByEmail(@PathVariable String name) {
         PaymentSchemeDto paymentScheme = paymentSchemeService.getSchemeBySchemeName(name);
         return new ResponseEntity<>(
                 new CommonResponseDTO(true, "Student found!", paymentScheme), HttpStatus.OK);
@@ -38,7 +38,7 @@ public class PaymentDivisionController {
     }
 
     @GetMapping("/get-all-schemes")
-    public ResponseEntity getAllPaymentSchemes(){
+    public ResponseEntity getAllPaymentSchemes() {
         List<PaymentSchemeDto> paymentSchemes = paymentSchemeService.getAllPaymentSchemes();
         return new ResponseEntity(
                 new CommonResponseDTO(true, "Schemes loaded!", paymentSchemes), HttpStatus.OK

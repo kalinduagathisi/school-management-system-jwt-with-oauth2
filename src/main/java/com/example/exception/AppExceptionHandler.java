@@ -20,10 +20,10 @@ public class AppExceptionHandler {
     // in build
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleInvalidArgument(MethodArgumentNotValidException exception){
+    public Map<String, String> handleInvalidArgument(MethodArgumentNotValidException exception) {
         Map<String, String> errorMap = new HashMap<>();
         exception.getBindingResult().getFieldErrors().forEach(
-                error-> {
+                error -> {
                     errorMap.put(error.getField(), error.getDefaultMessage());
                 }
         );
@@ -37,7 +37,7 @@ public class AppExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return new ResponseEntity<>("Invalid input: " +ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Invalid input: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 

@@ -15,5 +15,6 @@ public interface StudentService {
     Boolean updateStudent(UpdateStudentRequestDto updateStudentRequestDto);
     StudentDto getStudentByEmail(String email);
     List<StudentDto> getAllStudents();
+    List<StudentDto> getStudentsByBirthMonthAndYear(int birthMonth, int birthYear);
 
 }

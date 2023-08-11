@@ -21,10 +21,11 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import java.util.Arrays;
 
-
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+	// Injecting necessary components
 	private final AuthenticationManager authenticationManager;
 	private final BCryptPasswordEncoder encoder;
 	private final CustomTokenEnhancer customTokenEnhancer;
@@ -37,6 +38,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		this.customTokenEnhancer = customTokenEnhancer;
 	}
 
+	// Configuring client details for OAuth2 clients
 	@Override
 	public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
 		configurer
@@ -49,16 +51,20 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.refreshTokenValiditySeconds(OAuth2Constant.REFRESH_TOKEN_VALIDITY_SECONDS);
 	}
 
+	// Configuring various endpoints and their behavior for authorization
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
 
+		// Setting up a chain of token enhancers
 		TokenEnhancerChain enhancerChain = new TokenEnhancerChain();
 		enhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
+
+		// Configuring authorization server endpoints
 		endpoints.tokenStore(tokenStore())
 				.tokenEnhancer(enhancerChain)
 				.authenticationManager(authenticationManager)
 				.accessTokenConverter(accessTokenConverter())
-                .pathMapping("/oauth/token", "/v1/authorize")
+				.pathMapping("/oauth/token", "/v1/authorize")  // Mapping the token endpoint to a custom URL
 				.exceptionTranslator(exception -> {
 					if (exception instanceof InvalidGrantException)
 						return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new CustomOauthException("invalid credentials."));
@@ -68,6 +74,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				});
 	}
 
+	// Bean definition for creating a JwtAccessTokenConverter
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
 		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
@@ -75,11 +82,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		return converter;
 	}
 
+	// Bean definition for creating a JwtTokenStore
 	@Bean
 	public TokenStore tokenStore() {
 		return new JwtTokenStore(accessTokenConverter());
 	}
 
+	// Bean definition for custom TokenEnhancer
 	@Bean
 	public TokenEnhancer tokenEnhancer() {
 		return customTokenEnhancer;
